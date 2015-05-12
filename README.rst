@@ -9,8 +9,8 @@ configparser.
 Source Code
 ~~~~~~~~~~~
 
-Source Code for configparser2 is on
-[Github](https://github.com/shubhamchaudhary/configparser2)
+Source Code for configparser2 is on 
+`Github <https://github.com/shubhamchaudhary/configparser2>`_.
 
 
 Installation
