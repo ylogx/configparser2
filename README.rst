@@ -1,12 +1,14 @@
 .. image:: https://travis-ci.org/shubhamchaudhary/configparser2.svg?branch=master
     :target: https://travis-ci.org/shubhamchaudhary/configparser2
-
 .. image:: https://coveralls.io/repos/shubhamchaudhary/configparser2/badge.svg
     :target: https://coveralls.io/r/shubhamchaudhary/configparser2
-
 .. image:: https://badge.waffle.io/shubhamchaudhary/configparser2.png?label=ready&title=Ready 
     :target: https://waffle.io/shubhamchaudhary/configparser2
     :alt: 'Stories in Ready'
+.. image:: https://img.shields.io/pypi/v/configparser2.svg
+    :target: https://pypi.python.org/pypi/configparser2
+.. image:: https://img.shields.io/github/tag/shubhamchaudhary/configparser2.svg
+.. image:: https://img.shields.io/github/release/shubhamchaudhary/configparser2.svg
  
 ============
 configparser2
