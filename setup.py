@@ -35,7 +35,7 @@ setup(
     author_email='me@shubhamchaudhary.in',
     description=__doc__,
     long_description=long_description,
-    url='http://docs.python.org/3/library/configparser.html',
+    url='https://github.com/shubhamchaudhary/configparser2',
     keywords='configparser configparser2 ini parsing conf cfg configuration file',
     platforms=['any'],
     license='MIT',
