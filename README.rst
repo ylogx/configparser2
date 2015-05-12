@@ -1,3 +1,6 @@
+.. image:: https://badge.waffle.io/shubhamchaudhary/configparser2.png?label=ready&title=Ready 
+ :target: https://waffle.io/shubhamchaudhary/configparser2
+ :alt: 'Stories in Ready'
 ============
 configparser2
 ============
