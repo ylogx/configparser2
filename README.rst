@@ -2,8 +2,8 @@
 configparser2
 ============
 
-configparser2 is simply derived from Lukasz Langa's configparser. The only
-difference is that the name is not conflicting with the default python3
+configparser2 is derived from Lukasz Langa's configparser mercurial repo. The
+only difference is a name is not conflicting with the default python3
 configparser.  
 
 
@@ -140,12 +140,20 @@ Maintenance
 This backport is maintained on BitBucket by Łukasz Langa, the current vanilla
 ``configparser2`` maintainer for CPython:
 
-* `configparser2 Mercurial repository <https://bitbucket.org/ambv/configparser2>`_
+* `configparser2 git repository <https://github.com/shubhamchaudhary/configparser2>`_
 
-* `configparser2 issue tracker <https://bitbucket.org/ambv/configparser2/issues>`_
+* `configparser2 Mercurial repository <https://github.com/shubhamchaudhary/configparser2>`_
+
+* `configparser2 issue tracker <https://github.com/shubhamchaudhary/configparser2/issues>`_
 
 Change Log
 ----------
+
+4.0.0
+~~~~~
+
+* Change name to configparser2
+
 
 3.5.0
 ~~~~~
