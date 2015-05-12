@@ -16,7 +16,7 @@ Source Code for configparser2 is on
 Installation
 ~~~~~~~~~~~~
 
-A quick `pip install configparser2` should do the job.
+A quick ``pip install configparser2`` should do the job.
 
 
 Docs for configparser
