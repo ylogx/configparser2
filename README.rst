@@ -6,6 +6,22 @@ configparser2 is derived from Lukasz Langa's configparser mercurial repo. The
 only difference is a name is not conflicting with the default python3
 configparser.  
 
+Source Code
+~~~~~~~~~~~
+
+Source Code for configparser2 is on
+[Github](https://github.com/shubhamchaudhary/configparser2)
+
+
+Installation
+~~~~~~~~~~~~
+
+A quick `pip install configparser2` should do the job.
+
+
+Docs for configparser
+~~~~~~~~~~~~~~~~~~~~~
+
 
 The ancient ``ConfigParser`` module available in the standard library 2.x has
 seen a major update in Python 3.2. This is a backport of those changes so that
