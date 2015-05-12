@@ -9,7 +9,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 
-from backports.configparser import (
+from backports.configparser2 import (
     RawConfigParser,
     ConfigParser,
     SafeConfigParser,

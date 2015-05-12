@@ -20,23 +20,23 @@ requirements = []
 
 if sys.version_info[0] == 2:
     # bail on UTF-8 and enable `import configparser` for Python 2
-    author = 'Lukasz Langa'
-    modules = ['configparser']
+    author = 'Shubham Chaudhary'
+    modules = ['configparser2']
     if sys.version_info[1] < 7:
         requirements.append('ordereddict')
 else:
-    author = 'Łukasz Langa'
+    author = 'Shubham Chaudhary'
     modules = []
 
 setup(
-    name='configparser',
-    version='3.5.0b2',
+    name='configparser2',
+    version='4.0.0',
     author=author,
-    author_email='lukasz@langa.pl',
+    author_email='me@shubhamchaudhary.in',
     description=__doc__,
     long_description=long_description,
     url='http://docs.python.org/3/library/configparser.html',
-    keywords='configparser ini parsing conf cfg configuration file',
+    keywords='configparser configparser2 ini parsing conf cfg configuration file',
     platforms=['any'],
     license='MIT',
     py_modules=modules,

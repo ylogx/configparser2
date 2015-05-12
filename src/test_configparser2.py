@@ -21,8 +21,8 @@ try:
 except ImportError:
     from test import test_support as support
 
-from backports import configparser
-from backports.configparser.helpers import UserDict, PY2, open, str
+from backports import configparser2
+from backports.configparser2.helpers import UserDict, PY2, open, str
 
 
 class SortedDict(UserDict):
@@ -54,10 +54,10 @@ class CfgParserTestCaseClass(object):
     comment_prefixes = (';', '#')
     inline_comment_prefixes = (';', '#')
     empty_lines_in_values = True
-    dict_type = configparser._default_dict
+    dict_type = configparser2._default_dict
     strict = False
-    default_section = configparser.DEFAULTSECT
-    interpolation = configparser._UNSET
+    default_section = configparser2.DEFAULTSECT
+    interpolation = configparser2._UNSET
 
     def newconfig(self, defaults=None):
         arguments = dict(
@@ -149,9 +149,9 @@ class BasicTestCase(CfgParserTestCaseClass):
         # test vars= and fallback=
         eq(cf.get('Foo Bar', 'foo', fallback='baz'), 'bar1')
         eq(cf.get('Foo Bar', 'foo', vars={'foo': 'baz'}), 'baz')
-        with self.assertRaises(configparser.NoSectionError):
+        with self.assertRaises(configparser2.NoSectionError):
             cf.get('No Such Foo Bar', 'foo')
-        with self.assertRaises(configparser.NoOptionError):
+        with self.assertRaises(configparser2.NoOptionError):
             cf.get('Foo Bar', 'no-such-foo')
         eq(cf.get('No Such Foo Bar', 'foo', fallback='baz'), 'baz')
         eq(cf.get('Foo Bar', 'no-such-foo', fallback='baz'), 'baz')
@@ -160,20 +160,20 @@ class BasicTestCase(CfgParserTestCaseClass):
         eq(cf.getint('Types', 'int', fallback=18), 42)
         eq(cf.getint('Types', 'no-such-int', fallback=18), 18)
         eq(cf.getint('Types', 'no-such-int', fallback="18"), "18") # sic!
-        with self.assertRaises(configparser.NoOptionError):
+        with self.assertRaises(configparser2.NoOptionError):
             cf.getint('Types', 'no-such-int')
         self.assertAlmostEqual(cf.getfloat('Types', 'float',
                                            fallback=0.0), 0.44)
         self.assertAlmostEqual(cf.getfloat('Types', 'no-such-float',
                                            fallback=0.0), 0.0)
         eq(cf.getfloat('Types', 'no-such-float', fallback="0.0"), "0.0") # sic!
-        with self.assertRaises(configparser.NoOptionError):
+        with self.assertRaises(configparser2.NoOptionError):
             cf.getfloat('Types', 'no-such-float')
         eq(cf.getboolean('Types', 'boolean', fallback=True), False)
         eq(cf.getboolean('Types', 'no-such-boolean', fallback="yes"),
            "yes") # sic!
         eq(cf.getboolean('Types', 'no-such-boolean', fallback=True), True)
-        with self.assertRaises(configparser.NoOptionError):
+        with self.assertRaises(configparser2.NoOptionError):
             cf.getboolean('Types', 'no-such-boolean')
         eq(cf.getboolean('No Such Types', 'boolean', fallback=True), True)
         if self.allow_no_value:
@@ -273,7 +273,7 @@ class BasicTestCase(CfgParserTestCaseClass):
         self.assertFalse(cf.has_option('Foo Bar', 'this_value'))
         self.assertFalse(cf.remove_option(self.default_section, 'this_value'))
 
-        with self.assertRaises(configparser.NoSectionError) as cm:
+        with self.assertRaises(configparser2.NoSectionError) as cm:
             cf.remove_option('No Such Section', 'foo')
         self.assertEqual(cm.exception.args, ('No Such Section',))
 
@@ -342,13 +342,13 @@ boolean {0[0]} NO
         cf = self.fromstring(config_string)
         self.basic_test(cf)
         if self.strict:
-            with self.assertRaises(configparser.DuplicateOptionError):
+            with self.assertRaises(configparser2.DuplicateOptionError):
                 cf.read_string(textwrap.dedent("""\
                     [Duplicate Options Here]
                     option {0[0]} with a value
                     option {0[1]} with another value
                 """.format(self.delimiters)))
-            with self.assertRaises(configparser.DuplicateSectionError):
+            with self.assertRaises(configparser2.DuplicateSectionError):
                 cf.read_string(textwrap.dedent("""\
                     [And Now For Something]
                     completely different {0[0]} True
@@ -418,12 +418,12 @@ boolean {0[0]} NO
         cf.read_dict(config)
         self.basic_test(cf)
         if self.strict:
-            with self.assertRaises(configparser.DuplicateSectionError):
+            with self.assertRaises(configparser2.DuplicateSectionError):
                 cf.read_dict({
                     '1': {'key': 'value'},
                     1: {'key2': 'value2'},
                 })
-            with self.assertRaises(configparser.DuplicateOptionError):
+            with self.assertRaises(configparser2.DuplicateOptionError):
                 cf.read_dict({
                     "Duplicate Options Here": {
                         'option': 'with a value',
@@ -455,7 +455,7 @@ boolean {0[0]} NO
         eq(cf.options("a"), ["b"])
         eq(cf.get("a", "b"), "value",
            "could not locate option, expecting case-insensitive option names")
-        with self.assertRaises(configparser.NoSectionError):
+        with self.assertRaises(configparser2.NoSectionError):
             # section names are case-sensitive
             cf.set("b", "A", "value")
         self.assertTrue(cf.has_option("a", "b"))
@@ -535,26 +535,26 @@ boolean {0[0]} NO
 
     def test_parse_errors(self):
         cf = self.newconfig()
-        self.parse_error(cf, configparser.ParsingError,
+        self.parse_error(cf, configparser2.ParsingError,
                          "[Foo]\n"
                          "{0}val-without-opt-name\n".format(self.delimiters[0]))
-        self.parse_error(cf, configparser.ParsingError,
+        self.parse_error(cf, configparser2.ParsingError,
                          "[Foo]\n"
                          "{0}val-without-opt-name\n".format(self.delimiters[1]))
-        e = self.parse_error(cf, configparser.MissingSectionHeaderError,
+        e = self.parse_error(cf, configparser2.MissingSectionHeaderError,
                              "No Section!\n")
         self.assertEqual(e.args, ('<???>', 1, "No Section!\n"))
         if not self.allow_no_value:
-            e = self.parse_error(cf, configparser.ParsingError,
+            e = self.parse_error(cf, configparser2.ParsingError,
                                 "[Foo]\n  wrong-indent\n")
             self.assertEqual(e.args, ('<???>',))
             # read_file on a real file
             tricky = support.findfile("cfgparser.3")
             if self.delimiters[0] == '=':
-                error = configparser.ParsingError
+                error = configparser2.ParsingError
                 expected = (tricky,)
             else:
-                error = configparser.MissingSectionHeaderError
+                error = configparser2.MissingSectionHeaderError
                 expected = (tricky, 1,
                             '  # INI with as many tricky parts as possible\n')
             with open(tricky, encoding='utf-8') as f:
@@ -573,18 +573,18 @@ boolean {0[0]} NO
     def test_query_errors(self):
         cf = self.newconfig()
         self.assertEqual(cf.sections(), [],
-                         "new ConfigParser should have no defined sections")
+                         "new configparser2 should have no defined sections")
         self.assertFalse(cf.has_section("Foo"),
-                         "new ConfigParser should have no acknowledged "
+                         "new configparser2 should have no acknowledged "
                          "sections")
-        with self.assertRaises(configparser.NoSectionError):
+        with self.assertRaises(configparser2.NoSectionError):
             cf.options("Foo")
-        with self.assertRaises(configparser.NoSectionError):
+        with self.assertRaises(configparser2.NoSectionError):
             cf.set("foo", "bar", "value")
-        e = self.get_error(cf, configparser.NoSectionError, "foo", "bar")
+        e = self.get_error(cf, configparser2.NoSectionError, "foo", "bar")
         self.assertEqual(e.args, ("foo",))
         cf.add_section("foo")
-        e = self.get_error(cf, configparser.NoOptionError, "foo", "bar")
+        e = self.get_error(cf, configparser2.NoOptionError, "foo", "bar")
         self.assertEqual(e.args, ("bar", "foo"))
 
     def get_error(self, cf, exc, section, option):
@@ -627,14 +627,14 @@ boolean {0[0]} NO
     def test_weird_errors(self):
         cf = self.newconfig()
         cf.add_section("Foo")
-        with self.assertRaises(configparser.DuplicateSectionError) as cm:
+        with self.assertRaises(configparser2.DuplicateSectionError) as cm:
             cf.add_section("Foo")
         e = cm.exception
         self.assertEqual(str(e), "Section {0!r} already exists".format('Foo'))
         self.assertEqual(e.args, ("Foo", None, None))
 
         if self.strict:
-            with self.assertRaises(configparser.DuplicateSectionError) as cm:
+            with self.assertRaises(configparser2.DuplicateSectionError) as cm:
                 cf.read_string(textwrap.dedent("""\
                     [Foo]
                     will this be added{equals}True
@@ -649,7 +649,7 @@ boolean {0[0]} NO
                                          '<foo-bar>', 'Foo'))
             self.assertEqual(e.args, ("Foo", '<foo-bar>', 5))
 
-            with self.assertRaises(configparser.DuplicateOptionError) as cm:
+            with self.assertRaises(configparser2.DuplicateOptionError) as cm:
                 cf.read_dict({'Bar': {'opt': 'val', 'OPT': 'is really `opt`'}})
             e = cm.exception
             self.assertEqual(str(e), "While reading from {0!r}: option {1!r} "
@@ -786,7 +786,7 @@ boolean {0[0]} NO
         L = list(cf.items("section", vars={'value': 'value'}))
         L.sort()
         self.assertEqual(L, expected)
-        with self.assertRaises(configparser.NoSectionError):
+        with self.assertRaises(configparser2.NoSectionError):
             cf.items("no such section")
 
     def test_popitem(self):
@@ -851,12 +851,12 @@ boolean {0[0]} NO
 
 
 class StrictTestCase(BasicTestCase, unittest.TestCase):
-    config_class = configparser.RawConfigParser
+    config_class = configparser2.RawConfigParser
     strict = True
 
 
 class ConfigParserTestCase(BasicTestCase, unittest.TestCase):
-    config_class = configparser.ConfigParser
+    config_class = configparser2.ConfigParser
 
     def test_interpolation(self):
         cf = self.get_interpolation_config()
@@ -866,24 +866,24 @@ class ConfigParserTestCase(BasicTestCase, unittest.TestCase):
            "something with lots of interpolation (9 steps)")
         eq(cf.get("Foo", "bar10"),
            "something with lots of interpolation (10 steps)")
-        e = self.get_error(cf, configparser.InterpolationDepthError, "Foo", "bar11")
-        if self.interpolation == configparser._UNSET:
+        e = self.get_error(cf, configparser2.InterpolationDepthError, "Foo", "bar11")
+        if self.interpolation == configparser2._UNSET:
             self.assertEqual(e.args, ("bar11", "Foo", "%(with1)s"))
-        elif isinstance(self.interpolation, configparser.LegacyInterpolation):
+        elif isinstance(self.interpolation, configparser2.LegacyInterpolation):
             self.assertEqual(e.args, ("bar11", "Foo",
                 "something %(with11)s lots of interpolation (11 steps)"))
 
     def test_interpolation_missing_value(self):
         cf = self.get_interpolation_config()
-        e = self.get_error(cf, configparser.InterpolationMissingOptionError,
+        e = self.get_error(cf, configparser2.InterpolationMissingOptionError,
                            "Interpolation Error", "name")
         self.assertEqual(e.reference, "reference")
         self.assertEqual(e.section, "Interpolation Error")
         self.assertEqual(e.option, "name")
-        if self.interpolation == configparser._UNSET:
+        if self.interpolation == configparser2._UNSET:
             self.assertEqual(e.args, ('name', 'Interpolation Error',
                                     '', 'reference'))
-        elif isinstance(self.interpolation, configparser.LegacyInterpolation):
+        elif isinstance(self.interpolation, configparser2.LegacyInterpolation):
             self.assertEqual(e.args, ('name', 'Interpolation Error',
                                     '%(reference)s', 'reference'))
 
@@ -903,9 +903,9 @@ class ConfigParserTestCase(BasicTestCase, unittest.TestCase):
                              "not_ok{eq}%(option2)s/%%s".format(
                                  eq=self.delimiters[0]))
         self.assertEqual(cf.get("section", "ok"), "xxx/%s")
-        if self.interpolation == configparser._UNSET:
+        if self.interpolation == configparser2._UNSET:
             self.assertEqual(cf.get("section", "not_ok"), "xxx/xxx/%s")
-        elif isinstance(self.interpolation, configparser.LegacyInterpolation):
+        elif isinstance(self.interpolation, configparser2.LegacyInterpolation):
             with self.assertRaises(TypeError):
                 cf.get("section", "not_ok")
 
@@ -945,7 +945,7 @@ class ConfigParserTestCase(BasicTestCase, unittest.TestCase):
 
 
 class ConfigParserTestCaseNoInterpolation(BasicTestCase, unittest.TestCase):
-    config_class = configparser.ConfigParser
+    config_class = configparser2.ConfigParser
     interpolation = None
     ini = textwrap.dedent("""
         [numbers]
@@ -972,7 +972,7 @@ class ConfigParserTestCaseNoInterpolation(BasicTestCase, unittest.TestCase):
         self.assertIsNone(cf.read_string(""))
 
     def test_none_as_default_interpolation(self):
-        class CustomConfigParser(configparser.ConfigParser):
+        class CustomConfigParser(configparser2.ConfigParser):
             _DEFAULT_INTERPOLATION = None
 
         cf = CustomConfigParser()
@@ -981,8 +981,8 @@ class ConfigParserTestCaseNoInterpolation(BasicTestCase, unittest.TestCase):
 
 
 class ConfigParserTestCaseLegacyInterpolation(ConfigParserTestCase, unittest.TestCase):
-    config_class = configparser.ConfigParser
-    interpolation = configparser.LegacyInterpolation()
+    config_class = configparser2.ConfigParser
+    interpolation = configparser2.LegacyInterpolation()
 
     def test_set_malformatted_interpolation(self):
         cf = self.fromstring("[sect]\n"
@@ -1010,7 +1010,7 @@ class ConfigParserTestCaseNonStandardDefaultSection(ConfigParserTestCase, unitte
     default_section = 'general'
 
 class MultilineValuesTestCase(BasicTestCase, unittest.TestCase):
-    config_class = configparser.ConfigParser
+    config_class = configparser2.ConfigParser
     wonderful_spam = ("I'm having spam spam spam spam "
                       "spam spam spam beaked beans spam "
                       "spam spam and spam!").replace(' ', '\t\n')
@@ -1038,7 +1038,7 @@ class MultilineValuesTestCase(BasicTestCase, unittest.TestCase):
                          self.wonderful_spam.replace('\t\n', '\n'))
 
 class RawConfigParserTestCase(BasicTestCase, unittest.TestCase):
-    config_class = configparser.RawConfigParser
+    config_class = configparser2.RawConfigParser
 
     def test_interpolation(self):
         cf = self.get_interpolation_config()
@@ -1072,7 +1072,7 @@ class RawConfigParserTestCase(BasicTestCase, unittest.TestCase):
         cf.add_section(123)
         cf.set(123, 'this is sick', True)
         self.assertEqual(cf.get(123, 'this is sick'), True)
-        if cf._dict is configparser._default_dict:
+        if cf._dict is configparser2._default_dict:
             # would not work for SortedDict; only checking for the most common
             # default dictionary (OrderedDict)
             cf.optionxform = lambda x: x
@@ -1085,7 +1085,7 @@ class RawConfigParserTestCaseNonStandardDelimiters(RawConfigParserTestCase):
     inline_comment_prefixes = ('//', '"')
 
 class RawConfigParserTestSambaConf(CfgParserTestCaseClass, unittest.TestCase):
-    config_class = configparser.RawConfigParser
+    config_class = configparser2.RawConfigParser
     comment_prefixes = ('#', ';', '----')
     inline_comment_prefixes = ('//',)
     empty_lines_in_values = False
@@ -1105,8 +1105,8 @@ class RawConfigParserTestSambaConf(CfgParserTestCaseClass, unittest.TestCase):
         self.assertEqual(cf.get("tmp", "echo command"), "cat %s; rm %s")
 
 class ConfigParserTestCaseExtendedInterpolation(BasicTestCase, unittest.TestCase):
-    config_class = configparser.ConfigParser
-    interpolation = configparser.ExtendedInterpolation()
+    config_class = configparser2.ConfigParser
+    interpolation = configparser2.ExtendedInterpolation()
     default_section = 'common'
     strict = True
 
@@ -1174,9 +1174,9 @@ class ConfigParserTestCaseExtendedInterpolation(BasicTestCase, unittest.TestCase
             me = ${me}
         """).strip())
 
-        with self.assertRaises(configparser.InterpolationDepthError):
+        with self.assertRaises(configparser2.InterpolationDepthError):
             cf['one for you']['ping']
-        with self.assertRaises(configparser.InterpolationDepthError):
+        with self.assertRaises(configparser2.InterpolationDepthError):
             cf['selfish']['me']
 
     def test_strange_options(self):
@@ -1194,7 +1194,7 @@ class ConfigParserTestCaseExtendedInterpolation(BasicTestCase, unittest.TestCase
         self.assertEqual(cf['dollars']['$var'], '$value')
         self.assertEqual(cf['interpolated']['$other'], '$value')
         self.assertEqual(cf['dollars']['${sick}'], 'cannot interpolate me')
-        exception_class = configparser.InterpolationMissingOptionError
+        exception_class = configparser2.InterpolationMissingOptionError
         with self.assertRaises(exception_class) as cm:
             cf['interpolated']['$trying']
         self.assertEqual(cm.exception.reference, 'dollars:${sick')
@@ -1238,7 +1238,7 @@ class ConfigParserTestCaseExtendedInterpolation(BasicTestCase, unittest.TestCase
             foo = ${common:option} redefined
             Foo = ${Common:Option} Redefined
         """).strip()
-        with self.assertRaises(configparser.DuplicateOptionError):
+        with self.assertRaises(configparser2.DuplicateOptionError):
             cf = self.fromstring(ini)
 
         # raw options
@@ -1261,15 +1261,15 @@ class ConfigParserTestCaseExtendedInterpolation(BasicTestCase, unittest.TestCase
             case5 = $100 for Fail No 5!
         """)
 
-        with self.assertRaises(configparser.InterpolationSyntaxError):
+        with self.assertRaises(configparser2.InterpolationSyntaxError):
             cf['interpolation fail']['case1']
-        with self.assertRaises(configparser.InterpolationMissingOptionError):
+        with self.assertRaises(configparser2.InterpolationMissingOptionError):
             cf['interpolation fail']['case2']
-        with self.assertRaises(configparser.InterpolationMissingOptionError):
+        with self.assertRaises(configparser2.InterpolationMissingOptionError):
             cf['interpolation fail']['case3']
-        with self.assertRaises(configparser.InterpolationSyntaxError):
+        with self.assertRaises(configparser2.InterpolationSyntaxError):
             cf['interpolation fail']['case4']
-        with self.assertRaises(configparser.InterpolationSyntaxError):
+        with self.assertRaises(configparser2.InterpolationSyntaxError):
             cf['interpolation fail']['case5']
         with self.assertRaises(ValueError):
             cf['interpolation fail']['case6'] = "BLACK $ABBATH"
@@ -1279,7 +1279,7 @@ class ConfigParserTestCaseNoValue(ConfigParserTestCase):
     allow_no_value = True
 
 class ConfigParserTestCaseTrickyFile(CfgParserTestCaseClass, unittest.TestCase):
-    config_class = configparser.ConfigParser
+    config_class = configparser2.ConfigParser
     delimiters = ['=']
     comment_prefixes = ['#']
     allow_no_value = True
@@ -1309,7 +1309,7 @@ class ConfigParserTestCaseTrickyFile(CfgParserTestCaseClass, unittest.TestCase):
         self.assertEqual(cf.get(longname, 'lets use some Unicode'), '片仮名')
         self.assertEqual(len(cf.items('another one!')), 5) # 4 in section and
                                                            # `go` from DEFAULT
-        with self.assertRaises(configparser.InterpolationMissingOptionError):
+        with self.assertRaises(configparser2.InterpolationMissingOptionError):
             cf.items('no values here')
         self.assertEqual(cf.get('tricky interpolation', 'lets'), 'do this')
         self.assertEqual(cf.get('tricky interpolation', 'lets'),
@@ -1342,13 +1342,13 @@ class Issue7005TestCase(unittest.TestCase):
         return sio.getvalue()
 
     def test_none_as_value_stringified(self):
-        cp = configparser.ConfigParser(allow_no_value=False)
+        cp = configparser2.ConfigParser(allow_no_value=False)
         cp.add_section("section")
         with self.assertRaises(TypeError):
             cp.set("section", "option", None)
 
     def test_none_as_value_stringified_raw(self):
-        output = self.prepare(configparser.RawConfigParser)
+        output = self.prepare(configparser2.RawConfigParser)
         self.assertEqual(output, self.expected_output)
 
 
@@ -1376,7 +1376,7 @@ class SortedTestCase(RawConfigParserTestCase):
 
 
 class CompatibleTestCase(CfgParserTestCaseClass, unittest.TestCase):
-    config_class = configparser.RawConfigParser
+    config_class = configparser2.RawConfigParser
     comment_prefixes = '#;'
     inline_comment_prefixes = ';'
 
@@ -1398,7 +1398,7 @@ class CompatibleTestCase(CfgParserTestCaseClass, unittest.TestCase):
                          'this;is not a comment')
 
 class CopyTestCase(BasicTestCase, unittest.TestCase):
-    config_class = configparser.ConfigParser
+    config_class = configparser2.ConfigParser
 
     def fromstring(self, string, defaults=None):
         cf = self.newconfig(defaults)
@@ -1430,7 +1430,7 @@ class FakeFile(object):
 
 
 def readline_generator(f):
-    """As advised in Doc/library/configparser.rst."""
+    """As advised in Doc/library/configparser2.rst."""
     line = f.readline()
     while line:
         yield line
@@ -1445,7 +1445,7 @@ class ReadFileTestCase(unittest.TestCase):
         except UnicodeEncodeError:
             pass   # unfortunately we can't test bytes on this path
         for file_path in file_paths:
-            parser = configparser.ConfigParser()
+            parser = configparser2.ConfigParser()
             with open(file_path) as f:
                 parser.read_file(f)
             self.assertIn("Foo Bar", parser)
@@ -1456,7 +1456,7 @@ class ReadFileTestCase(unittest.TestCase):
         lines = textwrap.dedent("""
         [Foo Bar]
         foo=newbar""").strip().split('\n')
-        parser = configparser.ConfigParser()
+        parser = configparser2.ConfigParser()
         parser.read_file(lines)
         self.assertIn("Foo Bar", parser)
         self.assertIn("foo", parser["Foo Bar"])
@@ -1464,7 +1464,7 @@ class ReadFileTestCase(unittest.TestCase):
 
     def test_readline_generator(self):
         """Issue #11670."""
-        parser = configparser.ConfigParser()
+        parser = configparser2.ConfigParser()
         with self.assertRaises(TypeError):
             parser.read_file(FakeFile())
         parser.read_file(readline_generator(FakeFile()))
@@ -1477,8 +1477,8 @@ def test_source_as_bytes(self):
     lines = textwrap.dedent("""
     [badbad]
     [badbad]""").strip().split('\n')
-    parser = configparser.ConfigParser()
-    with self.assertRaises(configparser.DuplicateSectionError) as dse:
+    parser = configparser2.ConfigParser()
+    with self.assertRaises(configparser2.DuplicateSectionError) as dse:
         parser.read_file(lines, source=b"badbad")
     self.assertEqual(
         str(dse.exception),
@@ -1489,8 +1489,8 @@ def test_source_as_bytes(self):
     [badbad]
     bad = bad
     bad = bad""").strip().split('\n')
-    parser = configparser.ConfigParser()
-    with self.assertRaises(configparser.DuplicateOptionError) as dse:
+    parser = configparser2.ConfigParser()
+    with self.assertRaises(configparser2.DuplicateOptionError) as dse:
         parser.read_file(lines, source=b"badbad")
     self.assertEqual(
         str(dse.exception),
@@ -1500,8 +1500,8 @@ def test_source_as_bytes(self):
     lines = textwrap.dedent("""
     [badbad]
     = bad""").strip().split('\n')
-    parser = configparser.ConfigParser()
-    with self.assertRaises(configparser.ParsingError) as dse:
+    parser = configparser2.ConfigParser()
+    with self.assertRaises(configparser2.ParsingError) as dse:
         parser.read_file(lines, source=b"badbad")
     self.assertEqual(
         str(dse.exception),
@@ -1510,8 +1510,8 @@ def test_source_as_bytes(self):
     lines = textwrap.dedent("""
     [badbad
     bad = bad""").strip().split('\n')
-    parser = configparser.ConfigParser()
-    with self.assertRaises(configparser.MissingSectionHeaderError) as dse:
+    parser = configparser2.ConfigParser()
+    with self.assertRaises(configparser2.MissingSectionHeaderError) as dse:
         parser.read_file(lines, source=b"badbad")
     self.assertEqual(
         str(dse.exception),
@@ -1524,7 +1524,7 @@ class CoverageOneHundredTestCase(unittest.TestCase):
     """Covers edge cases in the codebase."""
 
     def test_duplicate_option_error(self):
-        error = configparser.DuplicateOptionError('section', 'option')
+        error = configparser2.DuplicateOptionError('section', 'option')
         self.assertEqual(error.section, 'section')
         self.assertEqual(error.option, 'option')
         self.assertEqual(error.source, None)
@@ -1534,7 +1534,7 @@ class CoverageOneHundredTestCase(unittest.TestCase):
                                      "exists".format('option', 'section'))
 
     def test_interpolation_depth_error(self):
-        error = configparser.InterpolationDepthError('option', 'section',
+        error = configparser2.InterpolationDepthError('option', 'section',
                                                      'rawval')
         self.assertEqual(error.args, ('option', 'section', 'rawval'))
         self.assertEqual(error.option, 'option')
@@ -1542,14 +1542,14 @@ class CoverageOneHundredTestCase(unittest.TestCase):
 
     def test_parsing_error(self):
         with self.assertRaises(ValueError) as cm:
-            configparser.ParsingError()
+            configparser2.ParsingError()
         self.assertEqual(str(cm.exception), "Required argument `source' not "
                                             "given.")
         with self.assertRaises(ValueError) as cm:
-            configparser.ParsingError(source='source', filename='filename')
+            configparser2.ParsingError(source='source', filename='filename')
         self.assertEqual(str(cm.exception), "Cannot specify both `filename' "
                                             "and `source'. Use `source'.")
-        error = configparser.ParsingError(filename='source')
+        error = configparser2.ParsingError(filename='source')
         self.assertEqual(error.source, 'source')
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always", DeprecationWarning)
@@ -1560,18 +1560,18 @@ class CoverageOneHundredTestCase(unittest.TestCase):
             self.assertTrue(warning.category is DeprecationWarning)
 
     def test_interpolation_validation(self):
-        parser = configparser.ConfigParser()
+        parser = configparser2.ConfigParser()
         parser.read_string("""
             [section]
             invalid_percent = %
             invalid_reference = %(()
             invalid_variable = %(does_not_exist)s
         """)
-        with self.assertRaises(configparser.InterpolationSyntaxError) as cm:
+        with self.assertRaises(configparser2.InterpolationSyntaxError) as cm:
             parser['section']['invalid_percent']
         self.assertEqual(str(cm.exception), "'%' must be followed by '%' or "
                                             "'(', found: {0!r}".format('%'))
-        with self.assertRaises(configparser.InterpolationSyntaxError) as cm:
+        with self.assertRaises(configparser2.InterpolationSyntaxError) as cm:
             parser['section']['invalid_reference']
         self.assertEqual(str(cm.exception), "bad interpolation variable "
                                             "reference {0!r}".format('%(()'))
@@ -1581,7 +1581,7 @@ class CoverageOneHundredTestCase(unittest.TestCase):
         [section]
         option = value
         """)
-        parser = configparser.ConfigParser()
+        parser = configparser2.ConfigParser()
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always", DeprecationWarning)
             parser.readfp(sio, filename='StringIO')
@@ -1590,15 +1590,15 @@ class CoverageOneHundredTestCase(unittest.TestCase):
         self.assertEqual(len(parser), 2)
         self.assertEqual(parser['section']['option'], 'value')
 
-    def test_safeconfigparser_deprecation(self):
+    def test_safeconfigparser2_deprecation(self):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always", DeprecationWarning)
-            configparser.SafeConfigParser()
+            configparser2.SafeConfigParser()
         for warning in w:
             self.assertTrue(warning.category is DeprecationWarning)
 
     def test_sectionproxy_repr(self):
-        parser = configparser.ConfigParser()
+        parser = configparser2.ConfigParser()
         parser.read_string("""
             [section]
             key = value
@@ -1611,7 +1611,7 @@ class ExceptionPicklingTestCase(unittest.TestCase):
 
     def test_error(self):
         import pickle
-        e1 = configparser.Error('value')
+        e1 = configparser2.Error('value')
         pickled = pickle.dumps(e1)
         e2 = pickle.loads(pickled)
         self.assertEqual(e1.message, e2.message)
@@ -1619,7 +1619,7 @@ class ExceptionPicklingTestCase(unittest.TestCase):
 
     def test_nosectionerror(self):
         import pickle
-        e1 = configparser.NoSectionError('section')
+        e1 = configparser2.NoSectionError('section')
         pickled = pickle.dumps(e1)
         e2 = pickle.loads(pickled)
         self.assertEqual(e1.message, e2.message)
@@ -1629,7 +1629,7 @@ class ExceptionPicklingTestCase(unittest.TestCase):
 
     def test_nooptionerror(self):
         import pickle
-        e1 = configparser.NoOptionError('option', 'section')
+        e1 = configparser2.NoOptionError('option', 'section')
         pickled = pickle.dumps(e1)
         e2 = pickle.loads(pickled)
         self.assertEqual(e1.message, e2.message)
@@ -1640,7 +1640,7 @@ class ExceptionPicklingTestCase(unittest.TestCase):
 
     def test_duplicatesectionerror(self):
         import pickle
-        e1 = configparser.DuplicateSectionError('section', 'source', 123)
+        e1 = configparser2.DuplicateSectionError('section', 'source', 123)
         pickled = pickle.dumps(e1)
         e2 = pickle.loads(pickled)
         self.assertEqual(e1.message, e2.message)
@@ -1652,7 +1652,7 @@ class ExceptionPicklingTestCase(unittest.TestCase):
 
     def test_duplicateoptionerror(self):
         import pickle
-        e1 = configparser.DuplicateOptionError('section', 'option', 'source',
+        e1 = configparser2.DuplicateOptionError('section', 'option', 'source',
             123)
         pickled = pickle.dumps(e1)
         e2 = pickle.loads(pickled)
@@ -1666,7 +1666,7 @@ class ExceptionPicklingTestCase(unittest.TestCase):
 
     def test_interpolationerror(self):
         import pickle
-        e1 = configparser.InterpolationError('option', 'section', 'msg')
+        e1 = configparser2.InterpolationError('option', 'section', 'msg')
         pickled = pickle.dumps(e1)
         e2 = pickle.loads(pickled)
         self.assertEqual(e1.message, e2.message)
@@ -1677,7 +1677,7 @@ class ExceptionPicklingTestCase(unittest.TestCase):
 
     def test_interpolationmissingoptionerror(self):
         import pickle
-        e1 = configparser.InterpolationMissingOptionError('option', 'section',
+        e1 = configparser2.InterpolationMissingOptionError('option', 'section',
             'rawval', 'reference')
         pickled = pickle.dumps(e1)
         e2 = pickle.loads(pickled)
@@ -1690,7 +1690,7 @@ class ExceptionPicklingTestCase(unittest.TestCase):
 
     def test_interpolationsyntaxerror(self):
         import pickle
-        e1 = configparser.InterpolationSyntaxError('option', 'section', 'msg')
+        e1 = configparser2.InterpolationSyntaxError('option', 'section', 'msg')
         pickled = pickle.dumps(e1)
         e2 = pickle.loads(pickled)
         self.assertEqual(e1.message, e2.message)
@@ -1701,7 +1701,7 @@ class ExceptionPicklingTestCase(unittest.TestCase):
 
     def test_interpolationdeptherror(self):
         import pickle
-        e1 = configparser.InterpolationDepthError('option', 'section',
+        e1 = configparser2.InterpolationDepthError('option', 'section',
             'rawval')
         pickled = pickle.dumps(e1)
         e2 = pickle.loads(pickled)
@@ -1713,7 +1713,7 @@ class ExceptionPicklingTestCase(unittest.TestCase):
 
     def test_parsingerror(self):
         import pickle
-        e1 = configparser.ParsingError('source')
+        e1 = configparser2.ParsingError('source')
         e1.append(1, 'line1')
         e1.append(2, 'line2')
         e1.append(3, 'line3')
@@ -1724,7 +1724,7 @@ class ExceptionPicklingTestCase(unittest.TestCase):
         self.assertEqual(e1.source, e2.source)
         self.assertEqual(e1.errors, e2.errors)
         self.assertEqual(repr(e1), repr(e2))
-        e1 = configparser.ParsingError(filename='filename')
+        e1 = configparser2.ParsingError(filename='filename')
         e1.append(1, 'line1')
         e1.append(2, 'line2')
         e1.append(3, 'line3')
@@ -1738,7 +1738,7 @@ class ExceptionPicklingTestCase(unittest.TestCase):
 
     def test_missingsectionheadererror(self):
         import pickle
-        e1 = configparser.MissingSectionHeaderError('filename', 123, 'line')
+        e1 = configparser2.MissingSectionHeaderError('filename', 123, 'line')
         pickled = pickle.dumps(e1)
         e2 = pickle.loads(pickled)
         self.assertEqual(e1.message, e2.message)
@@ -1754,7 +1754,7 @@ class InlineCommentStrippingTestCase(unittest.TestCase):
     delimiter occurs earlier without preceding space.."""
 
     def test_stripping(self):
-        cfg = configparser.ConfigParser(inline_comment_prefixes=(';', '#',
+        cfg = configparser2.ConfigParser(inline_comment_prefixes=(';', '#',
                 '//'))
         cfg.read_string("""
         [section]
@@ -1790,51 +1790,51 @@ class ExceptionContextTestCase(unittest.TestCase):
     through raising exceptions. """
 
     def test_get_basic_interpolation(self):
-        parser = configparser.ConfigParser()
+        parser = configparser2.ConfigParser()
         parser.read_string("""
         [Paths]
         home_dir: /Users
         my_dir: %(home_dir1)s/lumberjack
         my_pictures: %(my_dir)s/Pictures
         """)
-        cm = self.assertRaises(configparser.InterpolationMissingOptionError)
+        cm = self.assertRaises(configparser2.InterpolationMissingOptionError)
         with cm:
             parser.get('Paths', 'my_dir')
         self.assertIs(cm.exception.__suppress_context__, True)
 
     def test_get_extended_interpolation(self):
-        parser = configparser.ConfigParser(
-          interpolation=configparser.ExtendedInterpolation())
+        parser = configparser2.ConfigParser(
+          interpolation=configparser2.ExtendedInterpolation())
         parser.read_string("""
         [Paths]
         home_dir: /Users
         my_dir: ${home_dir1}/lumberjack
         my_pictures: ${my_dir}/Pictures
         """)
-        cm = self.assertRaises(configparser.InterpolationMissingOptionError)
+        cm = self.assertRaises(configparser2.InterpolationMissingOptionError)
         with cm:
             parser.get('Paths', 'my_dir')
         self.assertIs(cm.exception.__suppress_context__, True)
 
     def test_missing_options(self):
-        parser = configparser.ConfigParser()
+        parser = configparser2.ConfigParser()
         parser.read_string("""
         [Paths]
         home_dir: /Users
         """)
-        with self.assertRaises(configparser.NoSectionError) as cm:
+        with self.assertRaises(configparser2.NoSectionError) as cm:
             parser.options('test')
         self.assertIs(cm.exception.__suppress_context__, True)
 
     def test_missing_section(self):
-        config = configparser.ConfigParser()
-        with self.assertRaises(configparser.NoSectionError) as cm:
+        config = configparser2.ConfigParser()
+        with self.assertRaises(configparser2.NoSectionError) as cm:
             config.set('Section1', 'an_int', '15')
         self.assertIs(cm.exception.__suppress_context__, True)
 
     def test_remove_option(self):
-        config = configparser.ConfigParser()
-        with self.assertRaises(configparser.NoSectionError) as cm:
+        config = configparser2.ConfigParser()
+        with self.assertRaises(configparser2.NoSectionError) as cm:
             config.remove_option('Section1', 'an_int')
         self.assertIs(cm.exception.__suppress_context__, True)
 
@@ -1843,7 +1843,7 @@ class UnicodeBackportTestCase(unittest.TestCase):
     """Test for the backport to check if the Unicode coercion works."""
 
     def test_unicode_none_old_style(self):
-        cp = configparser.ConfigParser(allow_no_value=True)
+        cp = configparser2.ConfigParser(allow_no_value=True)
         cp.add_section("section")
         self.assertIsInstance(cp.sections()[0], str)
         self.assertIsInstance([sect for sect in cp][0], str)
@@ -1851,7 +1851,7 @@ class UnicodeBackportTestCase(unittest.TestCase):
         self.assertIsAlright(cp, None)
 
     def test_unicode_none_new_style(self):
-        cp = configparser.ConfigParser(allow_no_value=True)
+        cp = configparser2.ConfigParser(allow_no_value=True)
         cp["section"] = {}
         self.assertIsInstance(cp.sections()[0], str)
         self.assertIsInstance([sect for sect in cp][0], str)
@@ -1859,12 +1859,12 @@ class UnicodeBackportTestCase(unittest.TestCase):
         self.assertIsAlright(cp, None)
 
     def test_unicode_none_new_style_one_step(self):
-        cp = configparser.ConfigParser(allow_no_value=True)
+        cp = configparser2.ConfigParser(allow_no_value=True)
         cp["section"] = {'nothing': None}
         self.assertIsAlright(cp, None)
 
     def test_unicode_unicode_old_style(self):
-        cp = configparser.ConfigParser()
+        cp = configparser2.ConfigParser()
         cp.add_section("section")
         self.assertIsInstance(cp.sections()[0], str)
         self.assertIsInstance([sect for sect in cp][0], str)
@@ -1872,7 +1872,7 @@ class UnicodeBackportTestCase(unittest.TestCase):
         self.assertIsAlright(cp, "nada")
 
     def test_unicode_unicode_new_style(self):
-        cp = configparser.ConfigParser()
+        cp = configparser2.ConfigParser()
         cp["section"] = {}
         self.assertIsInstance(cp.sections()[0], str)
         self.assertIsInstance([sect for sect in cp][0], str)
@@ -1880,37 +1880,37 @@ class UnicodeBackportTestCase(unittest.TestCase):
         self.assertIsAlright(cp, "nada")
 
     def test_unicode_unicode_new_style_one_step(self):
-        cp = configparser.ConfigParser()
+        cp = configparser2.ConfigParser()
         cp['section'] = {'nothing': 'nada'}
         self.assertIsAlright(cp, 'nada')
 
-    @unittest.skipIf(not PY2, "Bytes aren't supported in configparser on Py 3")
+    @unittest.skipIf(not PY2, "Bytes aren't supported in configparser2 on Py 3")
     def test_bytes_bytes_old_style(self):
-        cp = configparser.ConfigParser()
+        cp = configparser2.ConfigParser()
         cp.add_section(b"section")
         self.assertIsInstance(cp.sections()[0], str)
         self.assertIsInstance([sect for sect in cp][0], str)
         cp.set(b"section", b"nothing", b"nada")
         self.assertIsAlright(cp, b"nada")
 
-    @unittest.skipIf(not PY2, "Bytes aren't supported in configparser on Py 3")
+    @unittest.skipIf(not PY2, "Bytes aren't supported in configparser2 on Py 3")
     def test_bytes_bytes_new_style(self):
-        cp = configparser.ConfigParser()
+        cp = configparser2.ConfigParser()
         cp[b"section"] = {}
         self.assertIsInstance(cp.sections()[0], str)
         self.assertIsInstance([sect for sect in cp][0], str)
         cp[b"section"][b"nothing"] = b"nada"
         self.assertIsAlright(cp, b"nada")
 
-    @unittest.skipIf(not PY2, "Bytes aren't supported in configparser on Py 3")
+    @unittest.skipIf(not PY2, "Bytes aren't supported in configparser2 on Py 3")
     def test_bytes_bytes_new_style_one_step(self):
-        cp = configparser.ConfigParser()
+        cp = configparser2.ConfigParser()
         cp[b'section'] = {b'nothing': b'nada'}
         self.assertIsAlright(cp, b'nada')
 
-    @unittest.skipIf(not PY2, "Bytes aren't supported in configparser on Py 3")
+    @unittest.skipIf(not PY2, "Bytes aren't supported in configparser2 on Py 3")
     def test_bytes_exceptions(self):
-        cp = configparser.ConfigParser()
+        cp = configparser2.ConfigParser()
         cp[b'section'] = {b'nothing': b'nada'}
         self.assertIsAlright(cp, b'nada')
         with self.assertRaises(UnicodeDecodeError):
@@ -1931,7 +1931,7 @@ class UnicodeBackportTestCase(unittest.TestCase):
             cp['new'] = {b'key': b'\xef'}
 
     def test_unicode_extended_characters(self):
-        cp = configparser.ConfigParser()
+        cp = configparser2.ConfigParser()
         cp.add_section('section')
         cp.add_section('łąka1')
         cp['łąka2'] = {}

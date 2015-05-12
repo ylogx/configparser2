@@ -134,9 +134,9 @@ import re
 import sys
 import warnings
 
-from backports.configparser.helpers import OrderedDict as _default_dict
-from backports.configparser.helpers import ChainMap as _ChainMap
-from backports.configparser.helpers import from_none, open, str, PY2
+from backports.configparser2.helpers import OrderedDict as _default_dict
+from backports.configparser2.helpers import ChainMap as _ChainMap
+from backports.configparser2.helpers import from_none, open, str, PY2
 
 __all__ = ["NoSectionError", "DuplicateOptionError", "DuplicateSectionError",
            "NoOptionError", "InterpolationError", "InterpolationDepthError",
