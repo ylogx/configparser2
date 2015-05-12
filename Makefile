@@ -17,5 +17,5 @@ install:
 	pip install --upgrade dist/configparser2-$(VERSION).tar.gz
 
 coverage:
-	@coverage run tox
+	@tox
 	@coverage report

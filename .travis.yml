@@ -14,10 +14,11 @@ install:
   - pip install coveralls
 script:
   - tox
+  - coverage report
   - make install
 after_script:
-  - yes | pip uninstall universal
-  - pip install universal
+  - yes | pip uninstall configparser2
+  - pip install configparser2
 after_success:
   - make coverage
   - coveralls
