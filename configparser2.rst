@@ -1,17 +1,18 @@
-:mod:`configparser` --- Configuration file parser
+:mod:`configparser2` --- Configuration file parser
 =================================================
 
-.. module:: configparser
+.. module:: configparser2
    :synopsis: Configuration file parser.
 
 .. moduleauthor:: Ken Manheimer <klm@zope.com>
 .. moduleauthor:: Barry Warsaw <bwarsaw@python.org>
 .. moduleauthor:: Eric S. Raymond <esr@thyrsus.com>
 .. moduleauthor:: Łukasz Langa <lukasz@langa.pl>
+.. moduleauthor:: Shubham Chaudhary <me@shubhamchaudhary.in>
 .. sectionauthor:: Christopher G. Petrilli <petrilli@amber.org>
 .. sectionauthor:: Łukasz Langa <lukasz@langa.pl>
 
-**Source code:** :source:`Lib/configparser.py`
+**Source code:** :source:`Lib/configparser2.py`
 
 .. index::
    pair: .ini; file
@@ -63,13 +64,13 @@ Let's take a very basic configuration file that looks like this:
 The structure of INI files is described `in the following section
 <#supported-ini-file-structure>`_.  Essentially, the file
 consists of sections, each of which contains keys with values.
-:mod:`configparser` classes can read and write such files.  Let's start by
+:mod:`configparser2` classes can read and write such files.  Let's start by
 creating the above configuration file programatically.
 
 .. doctest::
 
-   >>> import configparser
-   >>> config = configparser.ConfigParser()
+   >>> import configparser2
+   >>> config = configparser2.ConfigParser()
    >>> config['DEFAULT'] = {'ServerAliveInterval': '45',
    ...                      'Compression': 'yes',
    ...                      'CompressionLevel': '9'}
@@ -93,8 +94,8 @@ back and explore the data it holds.
 
 .. doctest::
 
-   >>> import configparser
-   >>> config = configparser.ConfigParser()
+   >>> import configparser2
+   >>> config = configparser2.ConfigParser()
    >>> config.sections()
    []
    >>> config.read('example.ini')
@@ -362,7 +363,7 @@ Mapping Protocol Access
 .. versionadded:: 3.2
 
 Mapping protocol access is a generic name for functionality that enables using
-custom objects as if they were dictionaries.  In case of :mod:`configparser`,
+custom objects as if they were dictionaries.  In case of :mod:`configparser2`,
 the mapping interface implementation is using the
 ``parser['section']['option']`` notation.
 
@@ -372,7 +373,7 @@ the original parser on demand.  What's even more important is that when values
 are changed on a section proxy, they are actually mutated in the original
 parser.
 
-:mod:`configparser` objects behave as close to actual dictionaries as possible.
+:mod:`configparser2` objects behave as close to actual dictionaries as possible.
 The mapping interface is complete and adheres to the
 :class:`~collections.abc.MutableMapping` ABC.
 However, there are a few differences that should be taken into account:
@@ -402,7 +403,7 @@ However, there are a few differences that should be taken into account:
 
 * ``parser.get(section, option, **kwargs)`` - the second argument is **not**
   a fallback value. Note however that the section-level ``get()`` methods are
-  compatible both with the mapping protocol and the classic configparser API.
+  compatible both with the mapping protocol and the classic configparser2 API.
 
 * ``parser.items()`` is compatible with the mapping protocol (returns a list of
   *section_name*, *section_proxy* pairs including the DEFAULTSECT).  However,
@@ -420,7 +421,7 @@ Customizing Parser Behaviour
 ----------------------------
 
 There are nearly as many INI format variants as there are applications using it.
-:mod:`configparser` goes a long way to provide support for the largest sensible
+:mod:`configparser2` goes a long way to provide support for the largest sensible
 set of INI styles available.  The default functionality is mainly dictated by
 historical background and it's very likely that you will want to customize some
 of the features.
@@ -455,7 +456,7 @@ the :meth:`__init__` options:
 
   .. doctest::
 
-     >>> parser = configparser.ConfigParser()
+     >>> parser = configparser2.ConfigParser()
      >>> parser.read_dict({'section1': {'key1': 'value1',
      ...                                'key2': 'value2',
      ...                                'key3': 'value3'},
@@ -476,7 +477,7 @@ the :meth:`__init__` options:
   .. doctest::
 
      >>> from collections import OrderedDict
-     >>> parser = configparser.ConfigParser()
+     >>> parser = configparser2.ConfigParser()
      >>> parser.read_dict(
      ...   OrderedDict((
      ...     ('s1',
@@ -505,13 +506,13 @@ the :meth:`__init__` options:
 * *allow_no_value*, default value: ``False``
 
   Some configuration files are known to include settings without values, but
-  which otherwise conform to the syntax supported by :mod:`configparser`.  The
+  which otherwise conform to the syntax supported by :mod:`configparser2`.  The
   *allow_no_value* parameter to the constructor can be used to
   indicate that such values should be accepted:
 
   .. doctest::
 
-     >>> import configparser
+     >>> import configparser2
 
      >>> sample_config = """
      ... [mysqld]
@@ -523,7 +524,7 @@ the :meth:`__init__` options:
      ...   # we don't need ACID today
      ...   skip-innodb
      ... """
-     >>> config = configparser.ConfigParser(allow_no_value=True)
+     >>> config = configparser2.ConfigParser(allow_no_value=True)
      >>> config.read_string(sample_config)
 
      >>> # Settings with values are treated as before:
@@ -560,7 +561,7 @@ the :meth:`__init__` options:
   prefixes for whole line comments.
 
   .. versionchanged:: 3.2
-     In previous versions of :mod:`configparser` behaviour matched
+     In previous versions of :mod:`configparser2` behaviour matched
      ``comment_prefixes=('#',';')`` and ``inline_comment_prefixes=(';',)``.
 
   Please note that config parsers don't support escaping of comment prefixes so
@@ -570,7 +571,7 @@ the :meth:`__init__` options:
   comment prefix characters at the beginning of a line in multiline values is to
   interpolate the prefix, for example::
 
-    >>> from configparser import ConfigParser, ExtendedInterpolation
+    >>> from configparser2 import ConfigParser, ExtendedInterpolation
     >>> parser = ConfigParser(interpolation=ExtendedInterpolation())
     >>> # the default BasicInterpolation could be used as well
     >>> parser.read_string("""
@@ -617,7 +618,7 @@ the :meth:`__init__` options:
   parsers in new applications.
 
   .. versionchanged:: 3.2
-     In previous versions of :mod:`configparser` behaviour matched
+     In previous versions of :mod:`configparser2` behaviour matched
      ``strict=False``.
 
 * *empty_lines_in_values*, default value: ``True``
@@ -643,7 +644,7 @@ the :meth:`__init__` options:
   will make empty lines split keys every time.  In the example above, it would
   produce two keys, ``key`` and ``this``.
 
-* *default_section*, default value: ``configparser.DEFAULTSECT`` (that is:
+* *default_section*, default value: ``configparser2.DEFAULTSECT`` (that is:
   ``"DEFAULT"``)
 
   The convention of allowing a special section of default values for other
@@ -657,7 +658,7 @@ the :meth:`__init__` options:
   ``parser_instance.default_section`` attribute and may be modified at runtime
   (i.e. to convert files from one format to another).
 
-* *interpolation*, default value: ``configparser.BasicInterpolation``
+* *interpolation*, default value: ``configparser2.BasicInterpolation``
 
   Interpolation behaviour may be customized by providing a custom handler
   through the *interpolation* argument. ``None`` can be used to turn off
@@ -681,7 +682,7 @@ may be overridden by subclasses or by attribute assignment.
 
   .. doctest::
 
-     >>> custom = configparser.ConfigParser()
+     >>> custom = configparser2.ConfigParser()
      >>> custom['section1'] = {'funky': 'nope'}
      >>> custom['section1'].getboolean('funky')
      Traceback (most recent call last):
@@ -711,13 +712,13 @@ may be overridden by subclasses or by attribute assignment.
      ... [Section2]
      ... AnotherKey = Value
      ... """
-     >>> typical = configparser.ConfigParser()
+     >>> typical = configparser2.ConfigParser()
      >>> typical.read_string(config)
      >>> list(typical['Section1'].keys())
      ['key']
      >>> list(typical['Section2'].keys())
      ['anotherkey']
-     >>> custom = configparser.RawConfigParser()
+     >>> custom = configparser2.RawConfigParser()
      >>> custom.optionxform = lambda option: option
      >>> custom.read_string(config)
      >>> list(custom['Section1'].keys())
@@ -761,7 +762,7 @@ may be overridden by subclasses or by attribute assignment.
 Legacy API Examples
 -------------------
 
-Mainly because of backwards compatibility concerns, :mod:`configparser`
+Mainly because of backwards compatibility concerns, :mod:`configparser2`
 provides also a legacy API with explicit ``get``/``set`` methods.  While there
 are valid use cases for the methods outlined below, mapping protocol access is
 preferred for new projects.  The legacy API is at times more advanced,
@@ -769,9 +770,9 @@ low-level and downright counterintuitive.
 
 An example of writing to a configuration file::
 
-   import configparser
+   import configparser2
 
-   config = configparser.RawConfigParser()
+   config = configparser2.RawConfigParser()
 
    # Please note that using RawConfigParser's set functions, you can assign
    # non-string values to keys internally, but will receive an error when
@@ -792,9 +793,9 @@ An example of writing to a configuration file::
 
 An example of reading the configuration file again::
 
-   import configparser
+   import configparser2
 
-   config = configparser.RawConfigParser()
+   config = configparser2.RawConfigParser()
    config.read('example.cfg')
 
    # getfloat() raises an exception if the value is not a float
@@ -810,9 +811,9 @@ An example of reading the configuration file again::
 
 To get interpolation, use :class:`ConfigParser`::
 
-   import configparser
+   import configparser2
 
-   cfg = configparser.ConfigParser()
+   cfg = configparser2.ConfigParser()
    cfg.read('example.cfg')
 
    # Set the optional *raw* argument of get() to True if you wish to disable
@@ -844,10 +845,10 @@ To get interpolation, use :class:`ConfigParser`::
 Default values are available in both types of ConfigParsers.  They are used in
 interpolation if an option used is not defined elsewhere. ::
 
-   import configparser
+   import configparser2
 
    # New instance with 'bar' and 'baz' defaulting to 'Life' and 'hard' each
-   config = configparser.ConfigParser({'bar': 'Life', 'baz': 'hard'})
+   config = configparser2.ConfigParser({'bar': 'Life', 'baz': 'hard'})
    config.read('example.cfg')
 
    print(config.get('Section1', 'foo')) # -> "Python is fun!"
@@ -856,12 +857,12 @@ interpolation if an option used is not defined elsewhere. ::
    print(config.get('Section1', 'foo')) # -> "Life is hard!"
 
 
-.. _configparser-objects:
+.. _configparser2-objects:
 
 ConfigParser Objects
 --------------------
 
-.. class:: ConfigParser(defaults=None, dict_type=collections.OrderedDict, allow_no_value=False, delimiters=('=', ':'), comment_prefixes=('#', ';'), inline_comment_prefixes=None, strict=True, empty_lines_in_values=True, default_section=configparser.DEFAULTSECT, interpolation=BasicInterpolation())
+.. class:: ConfigParser(defaults=None, dict_type=collections.OrderedDict, allow_no_value=False, delimiters=('=', ':'), comment_prefixes=('#', ';'), inline_comment_prefixes=None, strict=True, empty_lines_in_values=True, default_section=configparser2.DEFAULTSECT, interpolation=BasicInterpolation())
 
    The main configuration parser.  When *defaults* is given, it is initialized
    into the dictionary of intrinsic defaults.  When *dict_type* is given, it
@@ -965,9 +966,9 @@ ConfigParser Objects
       files using :meth:`read_file` before calling :meth:`read` for any
       optional files::
 
-         import configparser, os
+         import configparser2, os
 
-         config = configparser.ConfigParser()
+         config = configparser2.ConfigParser()
          config.read_file(open('defaults.cfg'))
          config.read(['site.cfg', os.path.expanduser('~/.myapp.cfg')],
                      encoding='cp1250')
@@ -1154,7 +1155,7 @@ ConfigParser Objects
    is used.
 
 
-.. _rawconfigparser-objects:
+.. _rawconfigparser2-objects:
 
 RawConfigParser Objects
 -----------------------
@@ -1164,7 +1165,7 @@ RawConfigParser Objects
                            comment_prefixes=('#', ';'), \
                            inline_comment_prefixes=None, strict=True, \
                            empty_lines_in_values=True, \
-                           default_section=configparser.DEFAULTSECT[, \
+                           default_section=configparser2.DEFAULTSECT[, \
                            interpolation])
 
    Legacy variant of the :class:`ConfigParser` with interpolation disabled
@@ -1206,7 +1207,7 @@ Exceptions
 
 .. exception:: Error
 
-   Base class for all other :mod:`configparser` exceptions.
+   Base class for all other :mod:`configparser2` exceptions.
 
 
 .. exception:: NoSectionError
